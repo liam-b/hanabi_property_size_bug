@@ -26,17 +26,17 @@ fn setup(mut commands: Commands, mut effects: ResMut<Assets<EffectAsset>>) {
         value: module.lit(Vec3::ZERO),
     };
 
-    let prop = module.prop("my_prop");
+    let prop = module.add_property("my_prop", Value::Matrix(Mat3::IDENTITY.into()));
+    let prop_expr = module.prop(prop);
     let x_vec = module.lit(Vec3::X);
 
     // Transform the x axis with the my_prop matrix
     let init_x_axis = SetAttributeModifier {
         attribute: Attribute::AXIS_X,
-        value: module.mul(prop, x_vec),
+        value: module.mul(prop_expr, x_vec),
     };
 
-    let effect = EffectAsset::new(32768, Spawner::rate(10.0.into()), module)
-        .with_property("my_prop", Value::Matrix(Mat3::IDENTITY.into())) // Should just be identity matrix
+    let effect = EffectAsset::new(vec![32768], Spawner::rate(10.0.into()), module)
         .init(init_pos)
         .init(init_x_axis);
 
@@ -45,7 +45,7 @@ fn setup(mut commands: Commands, mut effects: ResMut<Assets<EffectAsset>>) {
             effect: ParticleEffect::new(effects.add(effect)),
             ..default()
         },
-        EffectProperties::default(),
+        EffectProperties::default()
     ));
 }
 
